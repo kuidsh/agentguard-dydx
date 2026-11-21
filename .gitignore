@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.agentguard/
+.env
+*.egg-info/
+.aws-sam/
+docs/test-wallet.md
+video-tools/
+/docs/test-wallet.md
+CLAUDE.md

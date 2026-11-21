@@ -1,0 +1,21 @@
+{
+  "subaccount": {
+    "address": "dydx1testaddressredacted",
+    "subaccountNumber": 0,
+    "equity": "1000",
+    "freeCollateral": "1000",
+    "openPerpetualPositions": {},
+    "assetPositions": {
+      "USDC": {
+        "size": "1000",
+        "symbol": "USDC",
+        "side": "LONG",
+        "assetId": "0",
+        "subaccountNumber": 0
+      }
+    },
+    "marginEnabled": true,
+    "updatedAtHeight": "93105036",
+    "latestProcessedBlockHeight": "93105060"
+  }
+}

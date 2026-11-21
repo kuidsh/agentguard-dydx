@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  agentguard hosted mode (v0.3 milestone) - guard API for several agents, shared kill switch,
+  tamper-evident audit in S3 Object Lock. NOT deployed. Region: mx-central-1 (Mexico) preferred;
+  dYdX does not serve US persons, so avoid US regions for anything that talks to dYdX.
+
+Parameters:
+  PolicyJson: {Type: String, Description: "Policy JSON (operator-owned)"}
+  AuditRetentionDays: {Type: Number, Default: 365}
+
+Resources:
+  AuditBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      ObjectLockEnabled: true
+      ObjectLockConfiguration:
+        ObjectLockEnabled: Enabled
+        Rule: {DefaultRetention: {Mode: GOVERNANCE, Days: !Ref AuditRetentionDays}}
+      VersioningConfiguration: {Status: Enabled}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration: [{ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}}]
+      PublicAccessBlockConfiguration: {BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true}
+
+  StateTable:          # kill switch, day-start equity, rate counters, last audit hash per agent
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: pk, AttributeType: S}]
+      KeySchema: [{AttributeName: pk, KeyType: HASH}]
+      PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: false}
+
+  GuardFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Architectures: [arm64]
+      Handler: agentguard.lambda_api.handler     # v0.3
+      CodeUri: ../
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          AGENTGUARD_POLICY_JSON: !Ref PolicyJson
+          AGENTGUARD_TABLE: !Ref StateTable
+          AGENTGUARD_AUDIT_BUCKET: !Ref AuditBucket
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref StateTable}
+        - S3WritePolicy: {BucketName: !Ref AuditBucket}
+      FunctionUrlConfig:
+        AuthType: AWS_IAM            # agents call with SigV4; no public endpoint
+
+  GuardLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GuardFn}"
+      RetentionInDays: 30
+
+Outputs:
+  GuardUrl: {Value: !GetAtt GuardFnUrl.FunctionUrl}
+  AuditBucket: {Value: !Ref AuditBucket}

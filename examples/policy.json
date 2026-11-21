@@ -1,0 +1,17 @@
+{
+  "network": "testnet",
+  "allowed_markets": ["BTC-USD", "ETH-USD"],
+  "allowed_order_types": ["LIMIT", "MARKET"],
+  "max_order_notional_usd": "1000",
+  "max_position_notional_usd": "5000",
+  "max_gross_notional_usd": "10000",
+  "max_leverage": "3",
+  "max_daily_loss_usd": "250",
+  "max_orders_per_minute": 10,
+  "max_price_deviation_bps": 100,
+  "max_market_slippage_bps": 200,
+  "min_free_collateral_usd": "50",
+  "reduce_only_after_loss_limit": true,
+  "builder_address": "dydx1t28xa0r8xvssaxn7nr4lff3ut8t3tf5hku6j70",
+  "builder_fee_ppm": 300
+}
