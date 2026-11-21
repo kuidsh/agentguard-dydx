@@ -13,11 +13,11 @@ AI agents can already place orders on dYdX through MCP connectors, but none of t
 ## What already works (dYdX testnet, shown in the video)
 
 - An agent connects over MCP (Claude, Cursor, any MCP client) and can only trade through the guard.
-- **Allowed order:** a 0.001 BTC order passed the policy, was placed as a stateful order and partially filled on testnet (0.0008 BTC), with our builder code attached and a builder fee of $0.015056. The result is read back from the chain (FILLED / PARTIALLY_FILLED / RESTING / NOT_FILLED).
+- **Allowed order:** a 0.001 BTC order passed the policy, was placed as a stateful order and partially filled on testnet (0.0003 BTC across 3 fills), with our builder code attached and a builder fee of $0.005628. The result is read back from the chain (FILLED / PARTIALLY_FILLED / RESTING / NOT_FILLED).
 - **Rejected order:** a 5 BTC order was blocked for 4 policy reasons, before anything was signed.
 - **Kill switch:** with the operator kill switch on, every order is blocked. The agent can't turn it off.
 - **Audit:** every request, rejection and submission goes to a SHA-256 hash-chained log, and `agentguard verify` confirms it hasn't been changed (9 records, chain intact).
-- **Non-custodial:** the operator signs with their own key, and the guard never stores or returns it. Mainnet is refused until review. 44 automated tests.
+- **Non-custodial:** the operator signs with their own key, and the guard never stores or returns it. Mainnet is refused until review. 61 automated tests.
 - Found and fixed a client-side size-rounding issue (0.0003 floored to 0.0002) along the way. We can contribute that fix upstream.
 
 ## Milestones (proposed: US$9,000 total)
